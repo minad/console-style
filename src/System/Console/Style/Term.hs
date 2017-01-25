@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module System.Console.Style.Term (
   Term(..)
   , getTerm
@@ -7,6 +9,7 @@ module System.Console.Style.Term (
 import Data.List (isPrefixOf, isInfixOf)
 import System.Environment (getEnv)
 import System.IO (Handle, hIsTerminalDevice, stdout)
+import GHC.Generics (Generic)
 
 -- | Terminal type. For less capable terminals the color depth is automatically reduced.
 data Term
@@ -15,7 +18,7 @@ data Term
   | Term256  -- ^ 256 colors supported
   | TermRGB  -- ^ True colors supported
   | TermWin  -- ^ Windows terminal. Will use emulation (Not yet implemented).
-  deriving (Eq, Show)
+  deriving (Eq, Ord, Show, Read, Enum, Bounded, Generic)
 
 getTerm :: IO Term
 getTerm = hGetTerm stdout

@@ -20,9 +20,9 @@ module System.Console.Style.Nested (
 import System.IO (Handle, stdout, hPutStr)
 import System.Console.Style.Term
 import System.Console.Style.Color
+import System.Console.Style.Trustworthy
 import Data.String (IsString(..))
 import Data.Semigroup (Semigroup)
-import GHC.Exts (IsList(..))
 import GHC.Generics (Generic, Generic1)
 import qualified System.Console.Style.Flat as Flat
 import Control.Monad (ap)

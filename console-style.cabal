@@ -41,6 +41,7 @@ library
       System.Console.Style.SGR
       System.Console.Style.Style
       System.Console.Style.Term
+      System.Console.Style.Trustworthy
       Paths_console_style
   default-language: Haskell2010
 
