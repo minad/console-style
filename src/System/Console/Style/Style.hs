@@ -2,7 +2,7 @@ module System.Console.Style.Style (
   Style(..)
   , defaultStyle
   , setAttr, setBg, setFg
-  , resetStyle, saveStyle, restoreStyle
+  , resetStyle, pushStyle, popStyle
 ) where
 
 import System.Console.Style.Color
@@ -15,7 +15,7 @@ data Style = Style
   , styleBlink  :: !Bool
   , styleFg     :: !Color
   , styleBg     :: !Color
-  } deriving (Eq, Ord, Show)
+  } deriving (Eq)
 
 type StyleStack = (Style, [Style])
 
@@ -41,8 +41,8 @@ setBg, setFg :: Color -> Style -> Style
 setBg c s = s { styleBg = c }
 setFg c s = s { styleFg = c }
 
-resetStyle, saveStyle, restoreStyle :: StyleStack -> StyleStack
+resetStyle, pushStyle, popStyle :: StyleStack -> StyleStack
 resetStyle   (_, ys)     = (defaultStyle, ys)
-saveStyle    (y, ys)     = (y, y:ys)
-restoreStyle (_, [])     = (defaultStyle, [])
-restoreStyle (_, z : zs) = (z, zs)
+pushStyle    (y, ys)     = (y, y:ys)
+popStyle (_, [])     = (defaultStyle, [])
+popStyle (_, z : zs) = (z, zs)

@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module System.Console.Style.Color (
   Color(..)
   , Attribute(..)
@@ -7,6 +9,7 @@ module System.Console.Style.Color (
 import Data.Word (Word8)
 import Data.Bool (bool)
 import System.Console.Style.Term
+import GHC.Generics (Generic)
 
 -- | Rendering attribute
 data Attribute
@@ -15,7 +18,7 @@ data Attribute
   | Under    -- ^ Underlined text
   | Invert   -- ^ Invert foreground and background color
   | Blink    -- ^ Blinking
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Read, Enum, Bounded, Generic)
 
 -- | Named colors, 256 and RGB colors for more capable terminals.
 data Color
@@ -38,7 +41,7 @@ data Color
   | DullWhite
   | Color256 !Word8               -- ^ Color from 256 color scheme. Color is automatically reduced to 8 colors for less capable terminals.
   | RGB      !Word8 !Word8 !Word8 -- ^ True color. Color is automatically reduced to 256 or 8 colors for less capable terminals.
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Read, Generic)
 
 reduceColor :: Term -> Color -> Color
 reduceColor Term8    = reduceColor8

@@ -1,29 +1,31 @@
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE DeriveTraversable #-}
-module System.Console.Style.Monoid (
-  Styled(..)
-  , Flat(..)
-  , flatten
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE TypeFamilies #-}
+
+module System.Console.Style.Nested (
+  Attribute(..)
+  , Color(..)
+  , Term(..)
+  , Styled(..)
+  , hGetTerm
+  , getTerm
+  , printStyled
+  , hPrintStyled
+  , printStyledS
+  , hPrintStyledS
 ) where
 
+import System.IO (Handle, stdout, hPutStr)
+import System.Console.Style.Term
 import System.Console.Style.Color
-import Data.Semigroup (Semigroup)
 import Data.String (IsString(..))
+import Data.Semigroup (Semigroup)
 import GHC.Exts (IsList(..))
+import GHC.Generics (Generic, Generic1)
+import qualified System.Console.Style.Flat as Flat
 import Control.Monad (ap)
-
-data Flat a
-  = FValue a
-  | FSet   !Attribute
-  | FUnset !Attribute
-  | FFg    !Color
-  | FBg    !Color
-  | FSave
-  | FRestore
-  | FReset
-  deriving (Functor, Foldable, Traversable)
 
 data Styled a
   = Value a
@@ -32,7 +34,7 @@ data Styled a
   | Fg    !Color     (Styled a)
   | Bg    !Color     (Styled a)
   | List             [Styled a]
-  deriving (Functor, Foldable, Traversable)
+  deriving (Eq, Ord, Show, Read, Functor, Foldable, Traversable, Generic, Generic1)
 
 instance Applicative Styled where
   pure = Value
@@ -65,12 +67,24 @@ instance IsList (Styled a) where
   toList (List s) = s
   toList s         = [s]
 
-flatten :: Styled a -> [Flat a]
+flatten :: Styled a -> [Flat.Styled a]
 flatten s = go s []
-  where go (Value a)      = (FValue a :)
-        go (Set   a b)    = ((FSave : FSet   a : go b [FRestore]) ++)
-        go (Unset a b)    = ((FSave : FUnset a : go b [FRestore]) ++)
-        go (Fg    a b)    = ((FSave : FFg    a : go b [FRestore]) ++)
-        go (Bg    a b)    = ((FSave : FBg    a : go b [FRestore]) ++)
+  where go (Value a)      = (Flat.Value a :)
+        go (Set   a b)    = (Flat.Push:) . (Flat.Set   a:) . go b . (Flat.Pop:)
+        go (Unset a b)    = (Flat.Push:) . (Flat.Unset a:) . go b . (Flat.Pop:)
+        go (Fg    a b)    = (Flat.Push:) . (Flat.Fg    a:) . go b . (Flat.Pop:)
+        go (Bg    a b)    = (Flat.Push:) . (Flat.Bg    a:) . go b . (Flat.Pop:)
         go (List  [])     = id
         go (List  (x:xs)) = go x . go (List xs)
+
+printStyled :: Term -> Styled (IO ()) -> IO ()
+printStyled = hPrintStyled stdout
+
+hPrintStyled :: Handle -> Term -> Styled (IO ()) -> IO ()
+hPrintStyled handle term = Flat.hPrintStyled (const id) handle term . flatten
+
+printStyledS :: Term -> Styled String -> IO ()
+printStyledS = hPrintStyledS stdout
+
+hPrintStyledS :: Handle -> Term -> Styled String -> IO ()
+hPrintStyledS handle term = Flat.hPrintStyled hPutStr handle term . flatten

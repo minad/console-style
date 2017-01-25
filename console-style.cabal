@@ -36,8 +36,8 @@ library
       System.Console.Style
   other-modules:
       System.Console.Style.Color
-      System.Console.Style.Main
-      System.Console.Style.Monoid
+      System.Console.Style.Flat
+      System.Console.Style.Nested
       System.Console.Style.SGR
       System.Console.Style.Style
       System.Console.Style.Term

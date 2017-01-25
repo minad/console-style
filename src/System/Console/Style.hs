@@ -37,21 +37,12 @@ module System.Console.Style (
   , Color(..)
   , Term(..)
   , Styled(..)
-  , Flat(..)
   , hGetTerm
   , getTerm
   , printStyled
   , hPrintStyled
   , printStyledS
   , hPrintStyledS
-  , hPrintFlat
-  , printFlat
-  , showFlat
-  , showFlatA
-  , showFlatS
 ) where
 
-import System.Console.Style.Color
-import System.Console.Style.Term
-import System.Console.Style.Main
-import System.Console.Style.Monoid
+import System.Console.Style.Nested
