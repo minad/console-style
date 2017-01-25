@@ -36,6 +36,7 @@ library
       System.Console.Style
   other-modules:
       System.Console.Style.Color
+      System.Console.Style.Main
       System.Console.Style.Monoid
       System.Console.Style.SGR
       System.Console.Style.Style
