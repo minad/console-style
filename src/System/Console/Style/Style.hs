@@ -1,7 +1,8 @@
 module System.Console.Style.Style (
-  StyleState
-  , Style(..)
+  Style(..)
   , defaultStyle
+  , setAttr, setBg, setFg
+  , resetStyle, saveStyle, restoreStyle
 ) where
 
 import System.Console.Style.Color
@@ -16,7 +17,7 @@ data Style = Style
   , styleBg     :: !Color
   } deriving (Eq, Ord, Show)
 
-type StyleState = (Style, Style, [Style])
+type StyleStack = (Style, [Style])
 
 defaultStyle :: Style
 defaultStyle = Style
@@ -28,3 +29,20 @@ defaultStyle = Style
   , styleFg     = DefaultColor
   , styleBg     = DefaultColor
   }
+
+setAttr :: Attribute -> Bool -> Style -> Style
+setAttr Bold   b s = s { styleBold   = b }
+setAttr Italic b s = s { styleItalic = b }
+setAttr Under  b s = s { styleUnder  = b }
+setAttr Invert b s = s { styleInvert = b }
+setAttr Blink  b s = s { styleBlink  = b }
+
+setBg, setFg :: Color -> Style -> Style
+setBg c s = s { styleBg = c }
+setFg c s = s { styleFg = c }
+
+resetStyle, saveStyle, restoreStyle :: StyleStack -> StyleStack
+resetStyle   (_, ys)     = (defaultStyle, ys)
+saveStyle    (y, ys)     = (y, y:ys)
+restoreStyle (_, [])     = (defaultStyle, [])
+restoreStyle (_, z : zs) = (z, zs)

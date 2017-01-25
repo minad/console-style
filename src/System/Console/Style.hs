@@ -58,6 +58,7 @@ import System.Console.Style.Style
 import System.Console.Style.SGR
 import System.Console.Style.Monoid
 import Data.Functor.Identity
+import Data.Bifunctor (first, second)
 
 printStyled :: Term -> Styled (IO ()) -> IO ()
 printStyled = hPrintStyled stdout
@@ -84,31 +85,14 @@ showFlat :: Monoid o => (a -> o) -> (SGRCode -> o) -> Term -> [Flat a] -> o
 showFlat str code term flat = runIdentity $ showFlatA (pure . str) (pure . code) term flat
 
 showFlatA :: (Applicative m, Monoid o) => (a -> m o) -> (SGRCode -> m o) -> Term -> [Flat a] -> m o
-showFlatA str code term = go (defaultStyle, defaultStyle, [])
-  where go s (FSet   a:b) = go (setAttr a True s) b
-        go s (FUnset a:b) = go (setAttr a False s) b
-        go s (FFg    a:b) = go (setFg a s) b
-        go s (FBg    a:b) = go (setBg a s) b
-        go s (FSave   :b) = go (saveStyle s) b
-        go s (FRestore:b) = go (restoreStyle s) b
-        go s (FReset  :b) = go (resetStyle s) b
-        go s (FValue a:b) = let (old, new, stack) = s in
-          mappend <$> (mappend <$> code (sgrCode term old new) <*> str a) <*> go (new, new, stack) b
-        go s [] = let (old, new, _) = s in code (sgrCode term old new)
-
-setAttr :: Attribute -> Bool -> StyleState -> StyleState
-setAttr Bold   b (x, y, ys) = (x, y { styleBold   = b }, ys)
-setAttr Italic b (x, y, ys) = (x, y { styleItalic = b }, ys)
-setAttr Under  b (x, y, ys) = (x, y { styleUnder  = b }, ys)
-setAttr Invert b (x, y, ys) = (x, y { styleInvert = b }, ys)
-setAttr Blink  b (x, y, ys) = (x, y { styleBlink  = b }, ys)
-
-setBg, setFg :: Color -> StyleState -> StyleState
-setBg c (x, y, ys) = (x, y { styleBg = c }, ys)
-setFg c (x, y, ys) = (x, y { styleFg = c }, ys)
-
-resetStyle, saveStyle, restoreStyle :: StyleState -> StyleState
-resetStyle   (x, _, ys)     = (x, defaultStyle, ys)
-saveStyle    (x, y, ys)     = (x, y, y:ys)
-restoreStyle (_, y, [])     = (y, defaultStyle, [])
-restoreStyle (_, y, z : zs) = (y, z, zs)
+showFlatA str code term = go (defaultStyle, (defaultStyle, []))
+  where go s (FSet   a:b) = go ((second.first) (setAttr a True) s) b
+        go s (FUnset a:b) = go ((second.first) (setAttr a False) s) b
+        go s (FFg    a:b) = go ((second.first) (setFg a) s) b
+        go s (FBg    a:b) = go ((second.first) (setBg a) s) b
+        go s (FSave   :b) = go (second saveStyle s) b
+        go s (FRestore:b) = go (second restoreStyle s) b
+        go s (FReset  :b) = go (second resetStyle s) b
+        go s (FValue a:b) = let (old, stack@(new, _)) = s in
+          mappend <$> (mappend <$> code (sgrCode term old new) <*> str a) <*> go (new, stack) b
+        go s [] = let (old, (new, _)) = s in code (sgrCode term old new)
