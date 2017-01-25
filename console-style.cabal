@@ -35,9 +35,9 @@ library
   exposed-modules:
       System.Console.Style
       System.Console.Style.Flat
-      System.Console.Style.Nested
   other-modules:
       System.Console.Style.Color
+      System.Console.Style.Nested
       System.Console.Style.SGR
       System.Console.Style.Style
       System.Console.Style.Term

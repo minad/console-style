@@ -25,7 +25,8 @@ import Data.String (IsString(..))
 import Data.Semigroup (Semigroup)
 import GHC.Generics (Generic, Generic1)
 import qualified System.Console.Style.Flat as Flat
-import Control.Monad (ap)
+import Control.Monad (ap, MonadPlus(..))
+import Control.Applicative (Alternative(..))
 
 data Styled a
   = Value a
@@ -47,6 +48,14 @@ instance Monad Styled where
   Unset a x >>= f = Unset a (x >>= f)
   Fg    a x >>= f = Fg    a (x >>= f)
   Bg    a x >>= f = Bg    a (x >>= f)
+
+instance Alternative Styled where
+  empty = mempty
+  (<|>) = mappend
+
+instance MonadPlus Styled where
+  mzero = mempty
+  mplus = mappend
 
 instance Semigroup (Styled a)
 instance Monoid (Styled a) where

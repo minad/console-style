@@ -29,7 +29,6 @@ library:
   exposed-modules:
     - System.Console.Style
     - System.Console.Style.Flat
-    - System.Console.Style.Nested
 
 tests:
   example:
