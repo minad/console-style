@@ -116,4 +116,4 @@ resetStyle, saveStyle, restoreStyle :: StyleState -> StyleState
 resetStyle   (x, _, ys)     = (x, defaultStyle, ys)
 saveStyle    (x, y, ys)     = (x, y, y:ys)
 restoreStyle (_, y, [])     = (y, defaultStyle, [])
-restoreStyle (_, y, (z:zs)) = (y, z, zs)
+restoreStyle (_, y, z : zs) = (y, z, zs)
