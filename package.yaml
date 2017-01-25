@@ -26,7 +26,10 @@ when:
 
 library:
   source-dirs: src
-  exposed-modules: System.Console.Style
+  exposed-modules:
+    - System.Console.Style
+    - System.Console.Style.Flat
+    - System.Console.Style.Nested
 
 tests:
   example:

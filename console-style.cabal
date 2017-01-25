@@ -34,10 +34,10 @@ library
         semigroups >= 0.9 && < 1
   exposed-modules:
       System.Console.Style
-  other-modules:
-      System.Console.Style.Color
       System.Console.Style.Flat
       System.Console.Style.Nested
+  other-modules:
+      System.Console.Style.Color
       System.Console.Style.SGR
       System.Console.Style.Style
       System.Console.Style.Term
