@@ -1,12 +1,10 @@
 module System.Console.Style.Style (
   StyleState
-  , defaultStyleState
   , Style(..)
   , defaultStyle
 ) where
 
 import System.Console.Style.Color
-import Data.List.NonEmpty (NonEmpty)
 
 data Style = Style
   { styleBold   :: !Bool
@@ -18,7 +16,7 @@ data Style = Style
   , styleBg     :: !Color
   } deriving (Eq, Ord, Show)
 
-type StyleState = (Style, NonEmpty Style)
+type StyleState = (Style, Style, [Style])
 
 defaultStyle :: Style
 defaultStyle = Style
@@ -30,6 +28,3 @@ defaultStyle = Style
   , styleFg     = DefaultColor
   , styleBg     = DefaultColor
   }
-
-defaultStyleState :: StyleState
-defaultStyleState = (defaultStyle, pure defaultStyle)
