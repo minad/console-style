@@ -20,18 +20,13 @@
 -- Example:
 --
 -- > basicExample :: IO ()
--- > basicExample = runWithStyle [Fg Blue] $ do
--- >   withStyle [Bold] $ liftIO $ putStr "Bold Blue"
--- >
--- >   setStyle [Save, Set Italic, Bg Red]
--- >   liftIO $ putStr "Italic Red"
--- >   setStyle [Restore]
--- >
--- >   setStyle [Set Under]
--- >   liftIO $ putStr "Underlined Blue"
--- >   setStyle [Reset]
--- >
--- >   liftIO $ putStrLn "Normal output"
+-- > basicExample = do
+-- >  term <- getTerm
+-- >  printStyledS term $ Set Under $ Set Bold "Basic Example\n"
+-- >  printStyledS term $ Set Bold "Bold"
+-- >  printStyledS term $ Set Italic $ Bg Red "Italic Red"
+-- >  printStyledS term $ Set Under "Under"
+-- >  putChar '\n'
 --
 -- For many more examples, see the
 -- <https://github.com/minad/console-style/blob/master/example.hs example.hs> file.
