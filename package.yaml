@@ -18,9 +18,7 @@ ghc-options:
 - -Wall
 
 dependencies:
-- base         >= 4.8 && < 5
-- transformers >= 0.4 && < 0.6
-- mtl          >= 2.2 && < 2.4
+- base >= 4.8 && < 5
 
 when:
   - condition: impl(ghc < 8.0)
@@ -28,3 +26,10 @@ when:
 
 library:
   source-dirs: src
+  exposed-modules: System.Console.Style
+
+tests:
+  example:
+    main: example.hs
+    dependencies:
+    - console-style
